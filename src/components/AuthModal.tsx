@@ -21,8 +21,11 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent event bubbling
+    
     setError('');
     setIsLoading(true);
+    
     try {
       if (isLogin) {
         await login(email, password);
@@ -31,8 +34,8 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       }
       onClose();
     } catch (err: any) {
-      console.error('Auth Error:', err);
-      setError(err.response?.data?.error || 'Authentication failed. Please check your connection.');
+      console.error('Auth Error details:', err);
+      setError(err.response?.data?.error || 'Authentication failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -40,8 +43,12 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
+      <div 
+        className="bg-white rounded-2xl w-full max-w-md p-8 relative shadow-2xl"
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking modal content
+      >
         <button 
+          type="button"
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-2"
         >
@@ -67,7 +74,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-gray-50/50"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-gray-50/50 text-gray-900"
                 placeholder="John Doe"
               />
             </div>
@@ -79,7 +86,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-gray-50/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-gray-50/50 text-gray-900"
               placeholder="you@example.com"
             />
           </div>
@@ -90,7 +97,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-gray-50/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-gray-50/50 text-gray-900"
               placeholder="••••••••"
             />
           </div>
@@ -114,6 +121,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         <p className="mt-8 text-center text-gray-500 text-sm">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <button
+            type="button"
             onClick={() => {
               setIsLogin(!isLogin);
               setError('');
