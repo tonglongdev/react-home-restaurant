@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { X } from 'lucide-react';
 
@@ -13,19 +13,28 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
-  
   const [isLoading, setIsLoading] = useState(false);
   const { login, register } = useAuth();
+
+  // Clear form when modal is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setEmail('');
+      setPassword('');
+      setName('');
+      setError('');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevent event bubbling
-    
+    e.stopPropagation();
+
     setError('');
     setIsLoading(true);
-    
+
     try {
       if (isLogin) {
         await login(email, password);
@@ -34,7 +43,6 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       }
       onClose();
     } catch (err: any) {
-      console.error('Auth Error details:', err);
       setError(err.response?.data?.error || 'Authentication failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
@@ -42,10 +50,13 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
       <div 
         className="bg-white rounded-2xl w-full max-w-md p-8 relative shadow-2xl"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking modal content
+        onClick={(e) => e.stopPropagation()}
       >
         <button 
           type="button"
